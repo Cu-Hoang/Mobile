@@ -1,10 +1,12 @@
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv").config();
+require("dotenv").config();
 const cookieParser = require("cookie-parser");
+const createError = require('http-errors')
 const port = process.env.PORT || 5000;
 const initRoutes = require("./routes/index");
-require("./config/db");
+require("./config/connection_mongodb");
+require('./config/connection_redis')
 
 const app = express();
 app.use(
@@ -19,6 +21,15 @@ app.use(express.urlencoded({ extends: true }));
 
 
 initRoutes(app);
+app.use((req,res,next)=>{
+  next(createError.NotFound('This route does not exist'));
+})
+app.use((err,req,res,next)=>{
+  res.json({
+    status:err.status || 500,
+    msg: err.message
+  })
+})
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

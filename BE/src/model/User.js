@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { isEmail } = require("validator");
+const { use } = require("../routes/auth");
 const genders = ["male", "female"];
 const userSchema = new mongoose.Schema(
   {
@@ -33,4 +34,11 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+userSchema.pre('save',async function(next){
+  try {
+    console.log('Called before save',this.email,this.password);
+  } catch (error) {
+    next(error)
+  }
+})
 module.exports = mongoose.model("User", userSchema);

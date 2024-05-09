@@ -1,5 +1,8 @@
 BE:
+package:
 npm install nodemon --save-dev
-npm install express dotenv
+npm install express dotenv bcrypt cookie-parser cors dotenv express jsonwebtoken mongoose validator redis joi http-errors crypto
+
+change the MONGODB_URL in .env to connect MongoDB
 
 FE:
