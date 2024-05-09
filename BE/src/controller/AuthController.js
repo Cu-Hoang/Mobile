@@ -5,6 +5,7 @@ const { userValidate } = require("../helpers/validation");
 const createError = require("http-errors");
 const {signAccessToken,signRefreshToken} = require('../helpers/jwt');
 const { verifyRefreshToken } = require("../middleware/AuthMiddleware");
+const client = require('../config/connection_redis')
 
 require("dotenv").config();
 
@@ -123,7 +124,7 @@ const authController = {
       res.json({
         status: 'success',
         msg: 'login successfully',
-        //user: others,
+        user: others,
         accessToken: accessToken,
         refreshToken: refreshToken
       })
@@ -131,5 +132,22 @@ const authController = {
       next(error)
     }
   },
+  logout: async (req,res,next) =>{
+    try {
+      const {refreshToken} = req.body;
+      if(!refreshToken) throw createError.BadRequest();
+      const {userId} = await verifyRefreshToken(refreshToken)
+      client.del(userId.toString(),(err,reply) =>{
+        if(err){
+          throw createError.InternalServerError();
+        }
+        res.json({
+          msg: 'Logout'
+        })
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
 };
 module.exports = authController;
