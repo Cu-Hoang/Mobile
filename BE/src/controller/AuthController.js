@@ -1,5 +1,12 @@
 const User = require("../model/User");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { userValidate } = require("../helpers/validation");
+const createError = require("http-errors");
+const {signAccessToken,signRefreshToken} = require('../helpers/jwt');
+const { verifyRefreshToken } = require("../middleware/AuthMiddleware");
+
+require("dotenv").config();
 
 const authController = {
   register: async (req, res) => {
@@ -7,7 +14,7 @@ const authController = {
       // validate
       const { username, email, password } = req.body;
       console.log(req.body);
-      
+
       if (username === "" || email === "" || password === "") {
         res.json({
           status: "error",
@@ -33,9 +40,9 @@ const authController = {
           msg: "Password is too short",
         });
       } else {
-        console.log('hi');
         User.find({ email })
           .then((result) => {
+            console.log(result);
             if (result.length) {
               res.json({
                 status: "error",
@@ -64,7 +71,7 @@ const authController = {
                   .catch((err) => {
                     res.json({
                       status: "error",
-                      msg: "An error occured while saving  user",
+                      msg: "An error occured while saving user",
                     });
                   });
               });
@@ -80,6 +87,48 @@ const authController = {
       }
     } catch (error) {
       res.json(error);
+    }
+  },
+  refreshToken: async (req, res,next) => {
+    try {
+      const {refreshToken} = req.body;
+      console.log(refreshToken);
+      if(!refreshToken) throw createError.BadRequest();
+      const {userId} = await verifyRefreshToken(refreshToken);
+      const newAccessToken = await signAccessToken(userId)
+      const newRefreshToken = await signRefreshToken(userId)
+      res.json({
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken
+      })
+    } catch (error) {
+      next(error)
+    }
+  },
+  login: async (req, res, next) => {
+    try {
+      const {error}  = userValidate(req.body);
+      console.log(error);
+      if (error) {
+        throw createError(error.details[0].message);
+      }
+      const { email, password } = req.body;
+      const user = await User.findOne({ email });
+      if (!user) throw createError.NotFound("User is not registered");
+      const isValid = await bcrypt.compare(password, user.password);
+      if (!isValid) throw createError.Unauthorized();
+      const {password: userPassword, ...others} = user._doc
+      const accessToken = await signAccessToken(user._id)
+      const refreshToken = await signRefreshToken(user._id)
+      res.json({
+        status: 'success',
+        msg: 'login successfully',
+        //user: others,
+        accessToken: accessToken,
+        refreshToken: refreshToken
+      })
+    } catch (error) {
+      next(error)
     }
   },
 };
