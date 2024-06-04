@@ -19,6 +19,7 @@ router.get("/getlist", authMiddleware.verifyAccesstoken,(req, res, next) => {
     },
   ];
   res.json({
+    status: 'success',
     listUsers
   })
 });

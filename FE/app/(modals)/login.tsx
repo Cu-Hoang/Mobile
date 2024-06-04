@@ -7,18 +7,47 @@ import {
   TextInput,
   TouchableOpacity,
   Button,
+  ToastAndroid,
 } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import axios from "axios";
+import * as SecureStore from 'expo-secure-store';
+import instance from '../config/axios'
 
 const login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const handleOnEyeClick = () => {
     setShowPassword((pre) => !pre);
   };
+  const handleSubmit = async ()=>{
+    instance(
+      {
+        method: 'POST',
+        url: '/auth/login',
+        data: { email: email, password: password }
+      }
+    )
+    .then(async res =>{
+      if(res.data.status === 'success'){
+        ToastAndroid.show(res.data.msg, ToastAndroid.SHORT)
+        await SecureStore.setItem("accessToken", res.data.accessToken);
+        await SecureStore.setItem("refreshToken",res.data.refreshToken);
+        router.push("/(modals)/SearchPage")
+      }else{
+        ToastAndroid.show(res.data.msg, ToastAndroid.SHORT)
+      }
+    })
+    .catch(err =>{
+      console.log(err);
+      
+    })
+  }
   return (
     <SafeAreaView style={styles.container}>
       <ImageBackground
@@ -46,7 +75,9 @@ const login = () => {
             <TextInput
               style={{ ...styles.textInput }}
               placeholderTextColor="#ffffff80"
-              placeholder="Username/Email"
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
             />
             <View
               style={{
@@ -66,6 +97,9 @@ const login = () => {
                 placeholderTextColor="#ffffff80"
                 placeholder="Password"
                 secureTextEntry={!showPassword}
+                value={password}
+                onChangeText={setPassword}
+                
               />
               {showPassword ? (
                 <Ionicons
@@ -100,7 +134,7 @@ const login = () => {
 
           <View>
             <TouchableOpacity
-              onPress={() => router.push("/(modals)/SearchPage")}
+              onPress={handleSubmit}
               style={{
                 ...styles.button,
                 borderRadius: 10,
@@ -114,6 +148,7 @@ const login = () => {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
+              onPress={() => router.push("/(modals)/login-or-signup")}
               style={{
                 ...styles.button,
                 borderRadius: 10,

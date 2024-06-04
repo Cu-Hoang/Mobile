@@ -1,15 +1,24 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, ToastAndroid, TouchableOpacity, View } from "react-native";
 import EditMyProfile from "./EditMyProfile";
 import HelpSupport from "./HelpSupport";
 import Setting from "./Setting";
 import { router } from "expo-router";
+import instance from '../app/config/axios';
+import * as SecureStore from 'expo-secure-store';
 
 const MyAccount = () => {
   const [modalShow, setModalShow] = useState("");
-  const handleOnPress = (name: string) => {
+  const handleOnPress = async (name: string) => {
     if (name === "Log out") {
+      const refreshToken = await SecureStore.getItemAsync('refreshToken');
+      const result = await instance({
+        method:'DELETE',
+        url: '/auth/logout',
+        data: {refreshToken: refreshToken}
+      });
+      ToastAndroid.show(result.data.msg,ToastAndroid.SHORT)
       router.push("/login-or-signup");
     } else {
       setModalShow(name);
