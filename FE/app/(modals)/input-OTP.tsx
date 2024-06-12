@@ -7,10 +7,15 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import axios from "axios";
+import * as SecureStore from 'expo-secure-store';
+import instance from '../config/axios'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const inputOTP = () => {
   const input1Ref = useRef(null);
@@ -23,6 +28,38 @@ const inputOTP = () => {
       nextInputRef.current.focus();
     }
   };
+  let [otp] = useState('');
+  const updateCharacterAtIndex = (str, index, newChar) => {
+    if (index < 0 || index >= str.length) {
+        return str; // Trả về chuỗi gốc nếu index không hợp lệ
+    }
+    return str.slice(0, index) + newChar + str.slice(index + 1);
+}
+  const handleSubmit = async () => {
+    const userId = await AsyncStorage.getItem("userId")
+    if(userId){
+      instance(
+        {
+          method: 'POST',
+          url: '/mail/verify-otp',
+          data: { userId: userId, otp: otp }
+        }
+      )
+        .then(async res => {
+          if (res.data.status === 'success') {
+            ToastAndroid.show(res.data.msg, ToastAndroid.SHORT)
+            router.push("/change-password")
+          } else {
+            ToastAndroid.show(res.data.msg, ToastAndroid.SHORT)
+          }
+        })
+        .catch(err => {
+          console.log(err);
+  
+        })
+    }
+    
+  }
   return (
     <SafeAreaView style={styles.container}>
       <ImageBackground
@@ -62,6 +99,11 @@ const inputOTP = () => {
               placeholder=""
               onChangeText={(text) => {
                 if (text.length === 1) {
+                  if (otp.length === 0) otp = otp + text;
+                  else {
+                    otp = updateCharacterAtIndex(otp,0,text)
+                  }
+
                   focusNextInput(input2Ref);
                 }
               }}
@@ -76,6 +118,10 @@ const inputOTP = () => {
               placeholder=""
               onChangeText={(text) => {
                 if (text.length === 1) {
+                  if (otp.length === 1) otp = otp + text;
+                  else {
+                    otp = updateCharacterAtIndex(otp,1,text)
+                  }
                   focusNextInput(input3Ref);
                 }
               }}
@@ -90,6 +136,10 @@ const inputOTP = () => {
               placeholder=""
               onChangeText={(text) => {
                 if (text.length === 1) {
+                  if (otp.length === 2) otp = otp + text;
+                  else {
+                    otp = updateCharacterAtIndex(otp,2,text)
+                  }
                   focusNextInput(input4Ref);
                 }
               }}
@@ -102,12 +152,18 @@ const inputOTP = () => {
               style={{ ...styles.textInput, width: 65, height: 65 }}
               placeholderTextColor="#ffffff80"
               placeholder=""
+              onChangeText={(text) => {
+                if (otp.length === 3) otp = otp + text;
+                else {
+                  otp = updateCharacterAtIndex(otp,3,text)
+                }
+              }}
             />
           </View>
 
           <View>
             <TouchableOpacity
-              onPress={() => router.push("/(modals)/change-password")}
+              onPress={handleSubmit}
               style={{
                 ...styles.button,
                 borderRadius: 10,
@@ -121,6 +177,7 @@ const inputOTP = () => {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
+              onPress={() => router.push("/(modals)/login-or-signup")}
               style={{
                 ...styles.button,
                 borderRadius: 10,

@@ -1,11 +1,11 @@
 const User = require("../model/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { userValidate } = require("../helpers/validation");
+const { userValidate, confirmPassword } = require("../helpers/validation");
 const createError = require("http-errors");
-const {signAccessToken,signRefreshToken} = require('../helpers/jwt');
+const { signAccessToken, signRefreshToken } = require("../helpers/jwt");
 const { verifyRefreshToken } = require("../middleware/AuthMiddleware");
-const client = require('../config/connection_redis')
+const client = require("../config/connection_redis");
 
 require("dotenv").config();
 
@@ -90,25 +90,25 @@ const authController = {
       res.json(error);
     }
   },
-  refreshToken: async (req, res,next) => {
+  refreshToken: async (req, res, next) => {
     try {
-      const {refreshToken} = req.body;
+      const { refreshToken } = req.body;
       console.log(refreshToken);
-      if(!refreshToken) throw createError.BadRequest();
-      const {userId} = await verifyRefreshToken(refreshToken);
-      const newAccessToken = await signAccessToken(userId)
-      const newRefreshToken = await signRefreshToken(userId)
+      if (!refreshToken) throw createError.BadRequest();
+      const { userId } = await verifyRefreshToken(refreshToken);
+      const newAccessToken = await signAccessToken(userId);
+      const newRefreshToken = await signRefreshToken(userId);
       res.json({
         accessToken: newAccessToken,
-        refreshToken: newRefreshToken
-      })
+        refreshToken: newRefreshToken,
+      });
     } catch (error) {
-      next(error)
+      next(error);
     }
   },
   login: async (req, res, next) => {
     try {
-      const {error}  = userValidate(req.body);
+      const { error } = userValidate(req.body);
       console.log(error);
       if (error) {
         throw createError(error.details[0].message);
@@ -118,36 +118,59 @@ const authController = {
       if (!user) throw createError.NotFound("User is not registered");
       const isValid = await bcrypt.compare(password, user.password);
       if (!isValid) throw createError.Unauthorized();
-      const {password: userPassword, ...others} = user._doc
-      const accessToken = await signAccessToken(user._id)
-      const refreshToken = await signRefreshToken(user._id)
+      const { password: userPassword, ...others } = user._doc;
+      const accessToken = await signAccessToken(user._id);
+      const refreshToken = await signRefreshToken(user._id);
       res.json({
-        status: 'success',
-        msg: 'login successfully',
+        status: "success",
+        msg: "login successfully",
         user: others,
         accessToken: accessToken,
-        refreshToken: refreshToken
-      })
+        refreshToken: refreshToken,
+      });
     } catch (error) {
-      next(error)
+      next(error);
     }
   },
-  logout: async (req,res,next) =>{
+  logout: async (req, res, next) => {
     try {
-      const {refreshToken} = req.body;
-      if(!refreshToken) throw createError.BadRequest();
-      const {userId} = await verifyRefreshToken(refreshToken)
-      client.del(userId.toString(),(err,reply) =>{
-        if(err){
+      const { refreshToken } = req.body;
+      if (!refreshToken) throw createError.BadRequest();
+      const { userId } = await verifyRefreshToken(refreshToken);
+      client.del(userId.toString(), (err, reply) => {
+        if (err) {
           throw createError.InternalServerError();
         }
         res.json({
-          msg: 'Logout'
-        })
+          msg: "Logout",
+        });
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  update_password: async (req, res, next) => {
+    try {
+      const { error } = confirmPassword(req.body);
+      console.log(error);
+      if (error) throw createError(error.details[0].message);
+      const {userId,password} = req.body;
+      const filter = {_id: userId}
+      const saltRounds = 10;
+      const hashed = await bcrypt.hash(password, saltRounds);
+      const updateDoc = {
+        $set: {
+          password: hashed
+        },
+      };
+      await User.updateOne(filter, updateDoc);
+      return res.json({
+        status:"success",
+        msg: "update password successfully"
       })
     } catch (error) {
-      next(error)
+      next(error);
     }
-  }
+  },
 };
 module.exports = authController;

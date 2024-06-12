@@ -4,7 +4,7 @@ import * as SecureStore from "expo-secure-store";
 const accessToken = SecureStore.getItem('accessToken')
 const instance = axios.create({
   baseURL: "http://10.0.121.56:3000/api/v1",
-  timeout: 3000,
+  timeout: 10000,
   headers: {
     "Content-Type": "application/json; charset=utf-8",
     authorization: accessToken
@@ -33,7 +33,7 @@ instance.interceptors.response.use(
       return response;
     }
     const { status, msg } = response.data;
-    console.log(response.data);
+    //console.log(response.data);
     if (status && status === 401) {
       if (msg && msg === "jwt expired") {
         try {

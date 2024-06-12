@@ -7,16 +7,45 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import instance from '../config/axios'
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const changePassword = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const handleOnEyeClick = () => {
     setShowPassword((pre) => !pre);
   };
+  const [password, setPassword] = useState('');
+  const [confirm_password, setConfirm_password] = useState('');
+  const handleSubmit = async () => {
+    const userId = await AsyncStorage.getItem("userId")
+    if(userId){
+      instance(
+        {
+          method: 'POST',
+          url: '/auth/update_password',
+          data: { userId: userId, password: password, password_confirmation: confirm_password }
+        }
+      )
+        .then(async res => {
+          if (res.data.status === 'success') {
+            ToastAndroid.show(res.data.msg, ToastAndroid.SHORT)
+            router.push("/login-or-signup")
+          } else {
+            ToastAndroid.show(res.data.msg, ToastAndroid.SHORT)
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        })
+    }
+    
+  }
   return (
     <SafeAreaView style={styles.container}>
       <ImageBackground
@@ -45,6 +74,8 @@ const changePassword = () => {
               style={{ ...styles.textInput }}
               placeholderTextColor="#ffffff80"
               placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
             />
             <View
               style={{
@@ -64,6 +95,8 @@ const changePassword = () => {
                 placeholderTextColor="#ffffff80"
                 placeholder="Confirm Password"
                 secureTextEntry={!showPassword}
+                value={confirm_password}
+                onChangeText={setConfirm_password}
               />
               {showPassword ? (
                 <Ionicons
@@ -87,9 +120,7 @@ const changePassword = () => {
 
           <View>
             <TouchableOpacity
-              onPress={() =>
-                router.push(("message/" + "Password Reseted") as any)
-              }
+              onPress={handleSubmit}
               style={{
                 ...styles.button,
                 borderRadius: 10,
@@ -103,6 +134,7 @@ const changePassword = () => {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
+              onPress={() => router.push("/(modals)/login-or-signup")}
               style={{
                 ...styles.button,
                 borderRadius: 10,
