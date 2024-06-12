@@ -7,12 +7,43 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import axios from "axios";
+import * as SecureStore from 'expo-secure-store';
+import instance from '../config/axios'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const forgotPassowrd = () => {
+  const [email, setEmail] = useState('');
+  const handleSubmit = async ()=>{
+    instance(
+      {
+        method: 'POST',
+        url: '/mail/send-otp-forgot-password',
+        data: { email: email }
+      }
+    )
+    .then(async res =>{
+      if(res.data.status === 'success'){
+        ToastAndroid.show(res.data.msg, ToastAndroid.SHORT) 
+        const {userId} = res.data;
+        await AsyncStorage.setItem('userId',userId.toString())
+        const result = await AsyncStorage.getItem('userId')
+        console.log(result);
+        router.push("/input-OTP")
+      }else{
+        ToastAndroid.show(res.data.msg, ToastAndroid.SHORT)
+      }
+    })
+    .catch(err =>{
+      console.log(err);
+      
+    })
+  }
   return (
     <SafeAreaView style={styles.container}>
       <ImageBackground
@@ -41,12 +72,14 @@ const forgotPassowrd = () => {
               style={{ ...styles.textInput, marginBottom: 50 }}
               placeholderTextColor="#ffffff80"
               placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
             />
           </View>
 
           <View>
             <TouchableOpacity
-              onPress={() => router.push("/(modals)/input-OTP")}
+              onPress={handleSubmit}
               style={{
                 ...styles.button,
                 borderRadius: 10,
@@ -58,6 +91,7 @@ const forgotPassowrd = () => {
               <Text style={{ ...styles.buttonText, color: "black" }}>Find</Text>
             </TouchableOpacity>
             <TouchableOpacity
+              onPress={() => router.push("/(modals)/login-or-signup")}
               style={{
                 ...styles.button,
                 borderRadius: 10,
