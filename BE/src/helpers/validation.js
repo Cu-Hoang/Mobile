@@ -33,9 +33,16 @@ const confirmPassword = (data) => {
   });
   return confirm.validate(data);
 };
+const productValidate = (data) =>{
+  const productSchema = joi.object({
+    name: joi.string().required()
+  });
+  return productSchema.validate(data);
+}
 module.exports = {
   userValidate,
   emailValidate,
   otpValidate,
   confirmPassword,
+  productValidate
 };

@@ -42,7 +42,7 @@ instance.interceptors.response.use(
           console.log(refreshToken);
           const result = await instance({
             method: "POST",
-            url: "auth/refresh-token",
+            url: "/auth/refresh-token",
             data: { refreshToken: refreshToken },
           });
            await SecureStore.setItem("accessToken", result.data.accessToken);

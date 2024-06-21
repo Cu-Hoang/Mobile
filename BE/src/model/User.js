@@ -34,11 +34,11 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-userSchema.pre('save',async function(next){
+userSchema.pre("save", async function (next) {
   try {
-    console.log('Called before save',this.email,this.password);
+    console.log("Called before save", this.email, this.password);
   } catch (error) {
-    next(error)
+    next(error);
   }
-})
+});
 module.exports = mongoose.model("User", userSchema);
