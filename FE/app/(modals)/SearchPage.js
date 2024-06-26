@@ -22,18 +22,17 @@ const SearchPage = () => {
   const onIconsClick = useCallback(() => {
     Alert.alert("Notification", "Not");
   }, []);
-  useEffect(async () => {
-    try {
-      const response = await instance({
-        method: "GET",
-        url: "/product/getProducts",
+  useEffect(() => {
+    instance({
+      method: "GET",
+      url: "/product/getProducts",
+    })
+      .then((res) => {
+        if (res.data.status === "success") setProducts(res.data.data);
+      })
+      .catch((err) => {
+        console.log(err);
       });
-      if (response) {
-        if (response.data.status === "success") setProducts(response.data.data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
   }, []);
 
   return (
@@ -92,12 +91,19 @@ const SearchPage = () => {
                 style={[styles.rectangleLayout]}
                 Navigation="Review"
                 activeOpacity={0.2}
-                onPress={() => router.push("/(modals)/Review")}
+                onPress={() =>
+                  router.push({
+                    pathname: "/(modals)/Review",
+                    params: {
+                      productId: item._id,
+                    },
+                  })
+                }
               >
                 <Image
                   style={[styles.rectangleIcon, styles.rectangleLayout]}
                   resizeMode="cover"
-                  source={{uri: item.image}}
+                  source={{ uri: item.image }}
                 />
                 <Text style={[styles.strawberryTea, styles.bobasteaTypo]}>
                   {item.name}
