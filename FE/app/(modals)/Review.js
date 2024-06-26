@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Pressable,
@@ -11,10 +11,13 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { FontFamily, Color, FontSize, Border } from "../../GlobalStyles";
+import { useLocalSearchParams } from "expo-router";
+import instance from "../config/axios";
 
 const Review = () => {
   const navigation = useNavigation();
-
+  const { productId } = useLocalSearchParams();
+  const [product, setProduct] = useState({});
   const onAddToCartImageClick = useCallback(() => {
     Alert.alert("Add to cart", "Successful!");
   }, []);
@@ -26,7 +29,19 @@ const Review = () => {
   const onIconsClick = useCallback(() => {
     Alert.alert("Notification", "Not");
   }, []);
-
+  console.log(productId);
+  useEffect(() => {
+    instance({
+      method: "GET",
+      url: `/product/getProduct/${productId}`,
+    })
+      .then((res) => {
+        if (res.data.status === "success") setProduct(res.data.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
   return (
     <View style={styles.review}>
       <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
@@ -45,15 +60,15 @@ const Review = () => {
         <ImageBackground
           style={[styles.groupChild, styles.groupChildPosition]}
           resizeMode="cover"
-          source={require("../../assets/images/rectangle35.png")}
+          source={{ uri: product.image }}
         />
-        <Text style={[styles.Price, styles.Aligment]}>{`$39.9`}</Text>
+        <Text
+          style={[styles.Price, styles.Aligment]}
+        >{product.price}</Text>
         <View style={styles.groupParent}>
           <View style={[styles.rectangleGroup, styles.groupLayout]}>
             <View style={[styles.groupItem, styles.groupLayout]} />
-            <Text
-              style={[styles.FontText, styles.Aligment]}
-              numberOfLines={6}>
+            <Text style={[styles.FontText, styles.Aligment]} numberOfLines={6}>
               Lorem ipsum dolor sit amet consectetur. Sit fames netus
               consectetur venenatis leo commodo. Eu orci pretium orci tempor
               phasellus. Maecenas justo diam nibh aliquam. Diam vel ultricies
@@ -63,12 +78,13 @@ const Review = () => {
               sodales sodales nisi.
             </Text>
           </View>
-          <Text style={[styles.details, styles.Aligment]}>Details</Text>
+          
         </View>
         <TouchableOpacity
           style={[styles.addToCart, styles.wishlistLayout]}
           activeOpacity={0.2}
-          onPress={onAddToCartImageClick}>
+          onPress={onAddToCartImageClick}
+        >
           <Image
             style={styles.icon1}
             resizeMode="cover"
@@ -78,7 +94,8 @@ const Review = () => {
         <TouchableOpacity
           style={[styles.wishlist, styles.wishlistLayout]}
           activeOpacity={0.2}
-          onPress={onWishlistImageClick}>
+          onPress={onWishlistImageClick}
+        >
           <Image
             style={styles.icon1}
             resizeMode="cover"
@@ -125,7 +142,7 @@ const styles = StyleSheet.create({
   wishlistLayout: {
     height: 39,
     width: 166,
-    top: 241,
+    top: 460,
     position: "absolute",
   },
   icon: {
@@ -150,11 +167,11 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   groupChild: {
-    height: 188,
+    height: 400,
     top: 0,
   },
   Price: {
-    top: 200,
+    top: 420,
     left: 60,
     lineHeight: 26,
     width: 60,
@@ -196,7 +213,7 @@ const styles = StyleSheet.create({
     top: 0,
   },
   groupParent: {
-    top: 280,
+    top: 500,
     left: 45,
     height: 192,
     width: 320,
@@ -207,10 +224,10 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   addToCart: {
-    left: 7,
+    left: 30,
   },
   wishlist: {
-    left: 230,
+    right: 30,
   },
   rectangleParent: {
     top: 137,
@@ -218,7 +235,7 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   ratingStarsIcon: {
-    top: 343,
+    top: 560,
     left: 250,
     width: 115,
     height: 21,
