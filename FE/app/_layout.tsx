@@ -11,6 +11,7 @@ import { useCallback, useEffect, useState } from "react";
 import * as Font from "expo-font";
 
 import { useColorScheme } from "@/components/useColorScheme";
+import React from "react";
 SplashScreen.hideAsync();
 export {
   // Catch any errors thrown by the Layout component.
@@ -69,8 +70,8 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   useEffect(() => {
-    router.push("/(modals)/login-or-signup");
-  }, []);
+    router.push("/(modals)/SearchPage");
+  });
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

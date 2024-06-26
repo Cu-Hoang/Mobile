@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   TextInput,
   StyleSheet,
@@ -13,21 +13,31 @@ import {
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, FontSize, Border } from "../../GlobalStyles";
 import { router } from "expo-router";
+import instance from "../config/axios";
 
 const SearchPage = () => {
-const navigation = useNavigation();
+  const navigation = useNavigation();
+  const [products, setProducts] = useState([]);
 
   const onIconsClick = useCallback(() => {
     Alert.alert("Notification", "Not");
   }, []);
+  useEffect(async () => {
+    try {
+      const response = await instance({
+        method: "GET",
+        url: "/product/getProducts",
+      });
+      if (response) {
+        if (response.data.status === "success") setProducts(response.data.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
 
   return (
-    <View style={[styles.searchPage, styles.searchFlexBox]}>
-      <TextInput
-        style={[styles.searchPageChild, styles.searchFlexBox]}
-        placeholder="Search"
-        placeholderTextColor="rgba(60, 60, 67, 0.6)"
-      />
+    <View style={[styles.container, styles.searchPage]}>
       <Pressable style={styles.backButton} onPress={() => router.back()}>
         <Image
           style={styles.icon}
@@ -74,107 +84,48 @@ const navigation = useNavigation();
         <View style={styles.childShadowBox} />
         <Text style={[styles.button4, styles.buttonTypo]}>Account</Text>
       </Pressable>
-      <TouchableOpacity
-        style={[styles.TopRight, styles.groupChildLayout]}
-        Navigation="Review"
-        activeOpacity={0.2}
-        onPress={() => router.push("/(modals)/Review")}>
-        <View style={[styles.groupChild, styles.groupChildPosition]} />
-        <Image
-          style={styles.groupItem}
-          resizeMode="cover"
-          source={require("../../assets/images/rectangle-65.png")}
-        />
-        <Text
-          style={[styles.machiatto, styles.machiattoTypo]}>Machiatto</Text>
-        <Image
-          style={[styles.icons1, styles.iconsLayout]}
-          resizeMode="cover"
-          source={require("../../assets/images/icons1.png")}
-        />
-        <Image
-          style={styles.ratingStarsIcon}
-          resizeMode="cover"
-          source={require("../../assets/images/rating-stars.png")}
-        />
-      </TouchableOpacity>
-      <Pressable
-        style={[styles.BottomLeft, styles.groupInnerLayout]}
-        Navigation="Review"
-        onPress={() => router.push("/(modals)/Review")}>
-        <View style={[styles.rectangleGroup, styles.groupInnerLayout]}>
-          <Image
-            style={[styles.groupInner, styles.groupInnerLayout]}
-            resizeMode="cover"
-            source={require("../../assets/images/rectangle-58.png")}
-          />
-          <Text
-            style={[styles.traditionalBubbletea, styles.machiattoTypo]}>Traditional BubbleTea</Text>
-          <View style={[styles.icons2, styles.iconsLayout]}>
-            <Image
-              style={styles.vectorIcon}
-              resizeMode="cover"
-              source={require("../../assets/images/vector.png")}
-            />
+      <View style={{ paddingTop: 215, paddingLeft: 30 }}>
+        <ScrollView>
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            {products.map((item) => (
+              <TouchableOpacity
+                style={[styles.rectangleLayout]}
+                Navigation="Review"
+                activeOpacity={0.2}
+                onPress={() => router.push("/(modals)/Review")}
+              >
+                <Image
+                  style={[styles.rectangleIcon, styles.rectangleLayout]}
+                  resizeMode="cover"
+                  source={{uri: item.image}}
+                />
+                <Text style={[styles.strawberryTea, styles.bobasteaTypo]}>
+                  {item.name}
+                </Text>
+                <Image
+                  style={[styles.ratingStarsIcon2, styles.ratingIconLayout]}
+                  resizeMode="cover"
+                  source={require("../../assets/images/rating-stars1.png")}
+                />
+                <Image
+                  style={[styles.vectorIcon1, styles.vectorIconLayout]}
+                  resizeMode="cover"
+                  source={require("../../assets/images/vector1.png")}
+                />
+              </TouchableOpacity>
+            ))}
           </View>
-          <Image
-            style={[styles.ratingStarsIcon1, styles.ratingIconLayout]}
-            resizeMode="cover"
-            source={require("../../assets/images/rating-stars1.png")}
-          />
-        </View>
-      </Pressable>
-      <TouchableOpacity
-        style={[styles.Topleft, styles.rectangleLayout]}
-        Navigation="Review"
-        activeOpacity={0.2}
-        onPress={() => router.push("/(modals)/Review")}>
-        <Image
-          style={[styles.rectangleIcon, styles.rectangleLayout]}
-          resizeMode="cover"
-          source={require("../../assets/images/rectangle-66.png")}
-        />
-        <Text style={[styles.strawberryTea, styles.bobasteaTypo]}>Strawberry Tea</Text>
-        <Image
-          style={[styles.ratingStarsIcon2, styles.ratingIconLayout]}
-          resizeMode="cover"
-          source={require("../../assets/images/rating-stars1.png")}
-        />
-        <Image
-          style={[styles.vectorIcon1, styles.vectorIconLayout]}
-          resizeMode="cover"
-          source={require("../../assets/images/vector1.png")}
-        />
-      </TouchableOpacity>
-      <Pressable
-        style={[styles.BottomRight, styles.groupLayout]}
-        Navigation="Review"
-        onPress={() => router.push("/(modals)/Review")}>
-        <Image
-          style={[styles.groupChild1, styles.groupLayout]}
-          resizeMode="cover"
-          source={require("../../assets/images/rectangle-67.png")}
-        />
-        <Text style={[styles.bobastea, styles.bobasteaPosition]}>BobasTea</Text>
-        <Image
-          style={[styles.ratingStarsIcon3, styles.bobasteaPosition]}
-          resizeMode="cover"
-          source={require("../../assets/images/rating-stars1.png")}
-        />
-        <Image
-          style={[styles.vectorIcon2, styles.vectorIconLayout]}
-          resizeMode="cover"
-          source={require("../../assets/images/vector1.png")}
-        />
-      </Pressable>
+        </ScrollView>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  searchFlexBox: {
+  container: {
     justifyContent: "center",
   },
+  box: {},
   buttonLayout: {
     height: 31,
     width: 94,
@@ -222,7 +173,8 @@ const styles = StyleSheet.create({
   rectangleLayout: {
     height: 258,
     width: 160,
-    position: "absolute",
+    marginRight: 10,
+    marginBottom: 10,
   },
   bobasteaTypo: {
     color: Color.colorBlack,
