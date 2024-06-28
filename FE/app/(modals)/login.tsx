@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Button,
   ToastAndroid,
+  Pressable,
 } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,7 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import axios from "axios";
 import * as SecureStore from 'expo-secure-store';
-import instance from '../config/axios'
+import instance from '../config/axios';
 
 const login = () => {
   const [email, setEmail] = useState('');
@@ -25,7 +26,7 @@ const login = () => {
   const handleOnEyeClick = () => {
     setShowPassword((pre) => !pre);
   };
-  const handleSubmit = async ()=>{
+  const handleSubmit = async () => {
     instance(
       {
         method: 'POST',
@@ -33,23 +34,30 @@ const login = () => {
         data: { email: email, password: password }
       }
     )
-    .then(async res =>{
-      if(res.data.status === 'success'){
-        ToastAndroid.show(res.data.msg, ToastAndroid.SHORT)
-        await SecureStore.setItem("accessToken", res.data.accessToken);
-        await SecureStore.setItem("refreshToken",res.data.refreshToken);
-        router.push("/(modals)/SearchPage")
-      }else{
-        ToastAndroid.show(res.data.msg, ToastAndroid.SHORT)
-      }
-    })
-    .catch(err =>{
-      console.log(err);
-      
-    })
+      .then(async res => {
+        if (res.data.status === 'success') {
+          ToastAndroid.show(res.data.msg, ToastAndroid.SHORT)
+          await SecureStore.setItem("accessToken", res.data.accessToken);
+          await SecureStore.setItem("refreshToken", res.data.refreshToken);
+          router.push("/(tabs)");
+        } else {
+          ToastAndroid.show(res.data.msg, ToastAndroid.SHORT)
+        }
+      })
+      .catch(err => {
+        console.log(err);
+
+      })
   }
   return (
     <SafeAreaView style={styles.container}>
+      <Pressable style={styles.backButton} onPress={() => router.back()}>
+        <Image
+          style={styles.icon}
+          resizeMode="cover"
+          source={require("../../assets/images/back-button.png")}
+        />
+      </Pressable>
       <ImageBackground
         source={require("@/assets/images/background.png")}
         style={styles.image}
@@ -99,7 +107,7 @@ const login = () => {
                 secureTextEntry={!showPassword}
                 value={password}
                 onChangeText={setPassword}
-                
+
               />
               {showPassword ? (
                 <Ionicons
@@ -290,7 +298,19 @@ const styles = StyleSheet.create({
 
     color: "#fff",
   },
-
+  icon: {
+    overflow: "hidden",
+    height: "100%",
+    width: "100%",
+  },
+  backButton: {
+    left: 18,
+    zIndex: 1,
+    height: 24,
+    width: 24,
+    top: 40,
+    position: "absolute",
+  },
   button: {
     backgroundColor: "#007bff",
     borderRadius: 15,
