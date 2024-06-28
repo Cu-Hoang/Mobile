@@ -14,7 +14,8 @@ import {
   ToastAndroid,
   TouchableOpacity,
   View,
-  ScrollView
+  ScrollView,
+  Pressable
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -45,6 +46,13 @@ const signup = () => {
   };
   return (
     <SafeAreaView style={styles.container}>
+      <Pressable style={styles.backButton} onPress={() => router.back()}>
+        <Image
+          style={styles.icon}
+          resizeMode="cover"
+          source={require("../../assets/images/back-button.png")}
+        />
+      </Pressable>
       <ImageBackground
         source={require("@/assets/images/background.png")}
         style={styles.image}
@@ -260,7 +268,19 @@ const styles = StyleSheet.create({
 
     color: "#fff",
   },
-
+  icon: {
+    overflow: "hidden",
+    height: "100%",
+    width: "100%",
+  },
+  backButton: {
+    left: 18,
+    zIndex: 1,
+    height: 24,
+    width: 24,
+    top: 40,
+    position: "absolute",
+  },
   button: {
     backgroundColor: "#007bff",
     borderRadius: 15,

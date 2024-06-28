@@ -5,6 +5,7 @@ import {
   ImageBackground,
   Image,
   TouchableOpacity,
+  Pressable,
 } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,6 +15,13 @@ import { router } from "expo-router";
 const loginOrSignUp = () => {
   return (
     <SafeAreaView style={styles.container}>
+      <Pressable style={styles.backButton} onPress={() => router.back()}>
+        <Image
+          style={styles.icon}
+          resizeMode="cover"
+          source={require("../../assets/images/back-button.png")}
+        />
+      </Pressable>
       <ImageBackground
         source={require("@/assets/images/background.png")}
         style={styles.image}
@@ -70,7 +78,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 150,
   },
-
+  icon: {
+    overflow: "hidden",
+    height: "100%",
+    width: "100%",
+  },
+  backButton: {
+    left: 18,
+    zIndex: 1,
+    height: 24,
+    width: 24,
+    top: 40,
+    position: "absolute",
+  },
   button: {
     backgroundColor: "#007bff",
     borderRadius: 50,

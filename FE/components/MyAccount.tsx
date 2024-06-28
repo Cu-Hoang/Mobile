@@ -12,15 +12,25 @@ const MyAccount = () => {
   const [modalShow, setModalShow] = useState("");
   const handleOnPress = async (name: string) => {
     if (name === "Log out") {
-      const refreshToken = await SecureStore.getItemAsync('refreshToken');
-      const result = await instance({
-        method:'DELETE',
-        url: '/auth/logout',
-        data: {refreshToken: refreshToken}
-      });
-      ToastAndroid.show(result.data.msg,ToastAndroid.SHORT)
+      if (!await SecureStore.getItemAsync("accessToken") && !await SecureStore.getItemAsync("refreshToken")) {
+        ToastAndroid.show("You have to login before", ToastAndroid.SHORT);
+      } else {
+        const refreshToken = await SecureStore.getItemAsync('refreshToken');
+
+        const result = await instance({
+          method: 'DELETE',
+          url: '/auth/logout',
+          data: { refreshToken: refreshToken }
+        });
+        await SecureStore.deleteItemAsync("accessToken");
+        await SecureStore.deleteItemAsync("refreshToken");
+        ToastAndroid.show(result.data.msg, ToastAndroid.SHORT)
+      }
+
+    }else if (name === 'Log in'){
       router.push("/login-or-signup");
-    } else {
+    } 
+    else {
       setModalShow(name);
     }
   };
@@ -90,6 +100,10 @@ const render = [
   {
     name: "Help Support",
     icon: "chatbubble-outline",
+  },
+  {
+    name: "Log in",
+    icon: "log-in-outline",
   },
   {
     name: "Log out",

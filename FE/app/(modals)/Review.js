@@ -8,6 +8,7 @@ import {
   Text,
   TouchableOpacity,
   Alert,
+  ScrollView
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { FontFamily, Color, FontSize, Border } from "../../GlobalStyles";
@@ -70,12 +71,7 @@ const Review = () => {
             <View style={[styles.groupItem, styles.groupLayout]} />
             <Text style={[styles.FontText, styles.Aligment]} numberOfLines={6}>
               Lorem ipsum dolor sit amet consectetur. Sit fames netus
-              consectetur venenatis leo commodo. Eu orci pretium orci tempor
-              phasellus. Maecenas justo diam nibh aliquam. Diam vel ultricies
-              dis viverra. Semper massa fringilla metus turpis sit. Nisl
-              consequat adipiscing pulvinar lacus. Ultrices pellentesque cras
-              feugiat accumsan egestas a adipiscing nec. Faucibus sit eget
-              sodales sodales nisi.
+              consectetur venenatis leo commodo. Eu orci pretium orci      
             </Text>
           </View>
           
@@ -134,7 +130,7 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   groupLayout: {
-    height: 168,
+    height: 120,
     width: 320,
     left: 0,
     position: "absolute",

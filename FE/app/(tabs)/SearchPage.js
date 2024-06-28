@@ -76,13 +76,13 @@ const SearchPage = () => {
         <View style={styles.childShadowBox} />
         <Text style={[styles.button2, styles.buttonTypo]}>Best Sellers</Text>
       </Pressable>
-      <Pressable
+      {/* <Pressable
         style={[styles.Menu, styles.buttonLayout]}
         onPress={() => router.push("/(tabs)/account")}
       >
         <View style={styles.childShadowBox} />
         <Text style={[styles.button4, styles.buttonTypo]}>Account</Text>
-      </Pressable>
+      </Pressable> */}
       <View style={{ paddingTop: 215, paddingLeft: 30 }}>
         <ScrollView>
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   box: {},
   buttonLayout: {
     height: 31,
-    width: 94,
+    width: 160,
     top: 165,
     position: "absolute",
   },
@@ -260,14 +260,14 @@ const styles = StyleSheet.create({
     left: "26.81%",
   },
   promo: {
-    left: 50,
+    left: 30,
     zIndex: 4,
   },
   button2: {
     left: "10.85%",
   },
   bestseller: {
-    left: 275,
+    left: 200,
     zIndex: 5,
   },
   button4: {
