@@ -7,6 +7,9 @@ const port = process.env.PORT || 5000;
 const initRoutes = require("./routes/index");
 require("./config/connection_mongodb");
 require('./config/connection_redis')
+const mongoose = require('mongoose');
+const productRoutes = require('./routes/product');
+const favoriteRoutes = require('./routes/FavoriteRoutes');
 
 const app = express();
 app.use(
