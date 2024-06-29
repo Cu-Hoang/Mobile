@@ -56,23 +56,6 @@ const BestSeller = () => {
         source={require("../../assets/images/logoC22.png")}
       />
       <TouchableOpacity
-        style={[styles.button, styles.buttonLayout]}
-        Navigation="Promo Products"
-        activeOpacity={0.2}
-        onPress={() => router.push("/(modals)/PromoProducts")}
-      >
-        <View style={styles.buttonShadowBox} />
-        <Text style={[styles.button1, styles.buttonTypo]}>Promo</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.button2, styles.buttonLayout]}
-        Navigation="Best Seller"
-        activeOpacity={0.2}
-        onPress={() => {}}>
-        <View style={styles.buttonShadowBox} />
-        <Text style={[styles.button3, styles.buttonTypo]}>Best Seller</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
         style={[styles.icons, styles.iconsPosition]}
         activeOpacity={0.2}
         onPress={onIconsClick}
