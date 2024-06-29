@@ -8,21 +8,18 @@ import {
   Text,
   TouchableOpacity,
   Alert,
-  ScrollView
+  ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { FontFamily, Color, FontSize, Border } from "../../GlobalStyles";
 import { useLocalSearchParams } from "expo-router";
 import instance from "../config/axios";
-
+import { useDispatch } from "react-redux";
+import { addToCart } from "../redux/CartSlicer";
 const Review = () => {
   const navigation = useNavigation();
   const { productId } = useLocalSearchParams();
   const [product, setProduct] = useState({});
-  const onAddToCartImageClick = useCallback(() => {
-    Alert.alert("Add to cart", "Successful!");
-  }, []);
-
   const onWishlistImageClick = useCallback(() => {
     Alert.alert("Add to Wishlist", "Successfull!");
   }, []);
@@ -42,80 +39,93 @@ const Review = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  },[]);
+  const dispatch = useDispatch();
+  const handleAddToCart = () => {
+    dispatch(
+      addToCart({
+        ...product,
+        quantity: 1,
+      })
+    );
+    alert("success")
+  };
   return (
-    <View style={styles.review}>
-      <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Image
-          style={styles.icon}
-          resizeMode="cover"
-          source={require("../../assets/images/back-button.png")}
-        />
-      </Pressable>
-      <Image
-        style={styles.logoFullIcon}
-        resizeMode="cover"
-        source={require("../../assets/images/logoC22.png")}
-      />
-      <View style={[styles.rectangleParent, styles.groupChildPosition]}>
-        <ImageBackground
-          style={[styles.groupChild, styles.groupChildPosition]}
-          resizeMode="cover"
-          source={{ uri: product.image }}
-        />
-        <Text
-          style={[styles.Price, styles.Aligment]}
-        >{product.price}</Text>
-        <View style={styles.groupParent}>
-          <View style={[styles.rectangleGroup, styles.groupLayout]}>
-            <View style={[styles.groupItem, styles.groupLayout]} />
-            <Text style={[styles.FontText, styles.Aligment]} numberOfLines={6}>
-              Lorem ipsum dolor sit amet consectetur. Sit fames netus
-              consectetur venenatis leo commodo. Eu orci pretium orci      
-            </Text>
-          </View>
-          
-        </View>
-        <TouchableOpacity
-          style={[styles.addToCart, styles.wishlistLayout]}
-          activeOpacity={0.2}
-          onPress={onAddToCartImageClick}
+      <View style={styles.review}>
+        <Pressable
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
         >
           <Image
-            style={styles.icon1}
+            style={styles.icon}
             resizeMode="cover"
-            source={require("../../assets/images/addtocart.png")}
+            source={require("../../assets/images/back-button.png")}
           />
-        </TouchableOpacity>
+        </Pressable>
+        <Image
+          style={styles.logoFullIcon}
+          resizeMode="cover"
+          source={require("../../assets/images/logoC22.png")}
+        />
+        <View style={[styles.rectangleParent, styles.groupChildPosition]}>
+          <ImageBackground
+            style={[styles.groupChild, styles.groupChildPosition]}
+            resizeMode="cover"
+            source={{ uri: product.image }}
+          />
+          <Text style={[styles.Price, styles.Aligment]}>{product.price}</Text>
+          <View style={styles.groupParent}>
+            <View style={[styles.rectangleGroup, styles.groupLayout]}>
+              <View style={[styles.groupItem, styles.groupLayout]} />
+              <Text
+                style={[styles.FontText, styles.Aligment]}
+                numberOfLines={6}
+              >
+                Lorem ipsum dolor sit amet consectetur. Sit fames netus
+                consectetur venenatis leo commodo. Eu orci pretium orci
+              </Text>
+            </View>
+          </View>
+          <TouchableOpacity
+            style={[styles.addToCart, styles.wishlistLayout]}
+            activeOpacity={0.2}
+            onPress={handleAddToCart}
+          >
+            <Image
+              style={styles.icon1}
+              resizeMode="cover"
+              source={require("../../assets/images/addtocart.png")}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.wishlist, styles.wishlistLayout]}
+            activeOpacity={0.2}
+            onPress={onWishlistImageClick}
+          >
+            <Image
+              style={styles.icon1}
+              resizeMode="cover"
+              source={require("../../assets/images/wishlist.png")}
+            />
+          </TouchableOpacity>
+        </View>
+        <Image
+          style={styles.ratingStarsIcon}
+          resizeMode="cover"
+          source={require("../../assets/images/rating-stars3.png")}
+        />
         <TouchableOpacity
-          style={[styles.wishlist, styles.wishlistLayout]}
+          style={styles.icons}
           activeOpacity={0.2}
-          onPress={onWishlistImageClick}
+          onPress={onIconsClick}
         >
           <Image
-            style={styles.icon1}
+            style={styles.icon}
             resizeMode="cover"
-            source={require("../../assets/images/wishlist.png")}
+            source={require("../../assets/images/icons.png")}
           />
         </TouchableOpacity>
       </View>
-      <Image
-        style={styles.ratingStarsIcon}
-        resizeMode="cover"
-        source={require("../../assets/images/rating-stars3.png")}
-      />
-      <TouchableOpacity
-        style={styles.icons}
-        activeOpacity={0.2}
-        onPress={onIconsClick}
-      >
-        <Image
-          style={styles.icon}
-          resizeMode="cover"
-          source={require("../../assets/images/icons.png")}
-        />
-      </TouchableOpacity>
-    </View>
   );
 };
 
