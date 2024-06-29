@@ -8,7 +8,7 @@ import {
   Text,
   TouchableOpacity,
   Alert,
-  ScrollView
+  ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { FontFamily, Color, FontSize, Border } from "../../GlobalStyles";
@@ -19,17 +19,44 @@ const Review = () => {
   const navigation = useNavigation();
   const { productId } = useLocalSearchParams();
   const [product, setProduct] = useState({});
+  const userId = "YOUR_USER_ID"; // Thay thế bằng logic lấy userId thực tế
+
+  const addToFavorite = async (productId) => {
+    try {
+      console.log("Adding to favorite:", { userId, productId });
+
+      const response = await instance({
+        method: "POST",
+        url: "/favorites",
+        data: {
+          userId: userId,
+          productId: productId,
+        },
+      });
+
+      if (response.data.status === "success") {
+        Alert.alert("Add to Wishlist", "Successful!");
+      } else {
+        Alert.alert("Add to Wishlist", "Failed to add to favorite!");
+      }
+    } catch (error) {
+      console.error("Error adding to favorite:", error);
+      Alert.alert("Add to Wishlist", "Error occurred!");
+    }
+  };
+
   const onAddToCartImageClick = useCallback(() => {
     Alert.alert("Add to cart", "Successful!");
   }, []);
 
   const onWishlistImageClick = useCallback(() => {
-    Alert.alert("Add to Wishlist", "Successfull!");
-  }, []);
+    addToFavorite(productId);
+  }, [productId]);
 
   const onIconsClick = useCallback(() => {
     Alert.alert("Notification", "Not");
   }, []);
+  
   console.log(productId);
   useEffect(() => {
     instance({
@@ -43,6 +70,7 @@ const Review = () => {
         console.log(err);
       });
   }, []);
+
   return (
     <View style={styles.review}>
       <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
