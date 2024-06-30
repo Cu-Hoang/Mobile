@@ -10,6 +10,7 @@ require('./config/connection_redis')
 const mongoose = require('mongoose');
 const productRoutes = require('./routes/product');
 const favoriteRoutes = require('./routes/FavoriteRoutes');
+const userRoutes = require('./routes/UserRoutes')
 
 const app = express();
 app.use(
@@ -21,7 +22,8 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extends: true }));
-
+app.use('/api/products', productRoutes);
+app.use('/api/favorites', favoriteRoutes);
 
 initRoutes(app);
 app.use((req,res,next)=>{
@@ -36,3 +38,10 @@ app.use((err,req,res,next)=>{
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+                
+app.use("/api/users", userRoutes);
