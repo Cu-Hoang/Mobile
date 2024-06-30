@@ -7,9 +7,11 @@ import Setting from "./Setting";
 import { router } from "expo-router";
 import instance from '../app/config/axios';
 import * as SecureStore from 'expo-secure-store';
+import { useNavigation } from "@react-navigation/native";
 
 const MyAccount = () => {
   const [modalShow, setModalShow] = useState("");
+  const navigation = useNavigation();
   const handleOnPress = async (name: string) => {
     if (name === "Log out") {
       if (!await SecureStore.getItemAsync("accessToken") && !await SecureStore.getItemAsync("refreshToken")) {
@@ -24,7 +26,8 @@ const MyAccount = () => {
         });
         await SecureStore.deleteItemAsync("accessToken");
         await SecureStore.deleteItemAsync("refreshToken");
-        ToastAndroid.show(result.data.msg, ToastAndroid.SHORT)
+        ToastAndroid.show(result.data.msg, ToastAndroid.SHORT);
+        navigation.navigate("Cart");
       }
 
     }else if (name === 'Log in'){

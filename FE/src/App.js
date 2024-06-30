@@ -21,14 +21,12 @@ import wishlist from "../app/(tabs)/wishlist";
 import cart from "../app/(tabs)/cart";
 import account from "../app/(tabs)/account";
 import SearchPage from "../app/(tabs)/SearchPage";
-import { LogBox } from "react-native";
+import PaymentMethod from "../app/(modals)/PaymentMethod";
 import { useSelector } from "react-redux";
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 export default function App() {
-  
-  
   return (
     <NavigationContainer independent={true}>
       <Stack.Navigator>
@@ -84,29 +82,12 @@ export default function App() {
           component={splashScreen}
           options={{ presentation: "modal", headerShown: false }}
         />
-        {/* <Stack.Screen
-            name="(modals)/PromoProducts"
-            component={PromoProducts}
-            options={{ presentation: "modal", headerShown: false }}
-          />
-
-          <Stack.Screen
-            name="(modals)/BestSeller"
-            component={BestSeller}
-            options={{ presentation: "modal", headerShown: false }}
-          /> */}
-
-        {/* <Stack.Screen
-          name="(modals)/Review"
-          component={Review}
-          options={{ presentation: "modal", headerShown: false }}
-        /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
 function TabsNavigator() {
-  const {list} = useSelector(state => state.cart);
+  const { list } = useSelector((state) => state.cart);
   return (
     <Tab.Navigator
       screenOptions={{
@@ -149,7 +130,7 @@ function TabsNavigator() {
           tabBarBadge: list?.length,
           headerShown: false,
         }}
-        component={cart}
+        component={CartStackScreen}
       />
 
       <Tab.Screen
@@ -190,5 +171,22 @@ function HomeStackScreen() {
         options={{ headerShown: false }}
       />
     </HomeStack.Navigator>
+  );
+}
+const CartStack = createNativeStackNavigator();
+function CartStackScreen() {
+  return (
+    <CartStack.Navigator>
+      <CartStack.Screen
+        name="Cart"
+        component={cart}
+        options={{ headerShown: false }}
+      />
+      <CartStack.Screen
+        name="PaymentMethod"
+        component={PaymentMethod}
+        options={{ headerShown: false }}
+      />
+    </CartStack.Navigator>
   );
 }

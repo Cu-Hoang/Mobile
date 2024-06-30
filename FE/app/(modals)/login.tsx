@@ -18,11 +18,13 @@ import { router } from "expo-router";
 import axios from "axios";
 import * as SecureStore from 'expo-secure-store';
 import instance from '../config/axios';
+import { useNavigation } from "@react-navigation/native";
 
 const login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const navigation = useNavigation();
   const handleOnEyeClick = () => {
     setShowPassword((pre) => !pre);
   };
@@ -39,7 +41,8 @@ const login = () => {
           ToastAndroid.show(res.data.msg, ToastAndroid.SHORT)
           await SecureStore.setItem("accessToken", res.data.accessToken);
           await SecureStore.setItem("refreshToken", res.data.refreshToken);
-          router.push("/(tabs)");
+          await SecureStore.setItem("userId",res.data.user._id);
+          router.push("(tabs)");
         } else {
           ToastAndroid.show(res.data.msg, ToastAndroid.SHORT)
         }
