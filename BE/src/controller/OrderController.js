@@ -14,10 +14,12 @@ const orderController = {
               return res.json({
                 status: "error",
                 msg: "There was an error when creating a new oreder",
+                
               });
             return res.json({
               status: "success",
               msg: "Create a new order successfully",
+              data: result._doc
             });
           } catch (error) {
             next(error);

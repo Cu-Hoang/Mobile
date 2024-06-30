@@ -9,37 +9,54 @@ import {
   Text,
   Alert,
   ScrollView,
-  ToastAndroid,
 } from "react-native";
+import {  useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, FontSize, Border } from "../../GlobalStyles";
 import { router } from "expo-router";
-import { useSelector } from "react-redux";
-import BoxCart from "../../components/BoxCart";
-import * as SecureStore from 'expo-secure-store';
-import { useNavigation } from "@react-navigation/native";
+import instance from "../config/axios";
+import { useSelector,useDispatch } from "react-redux";
+import * as SecureStore from "expo-secure-store";
+import { resetCart } from "../redux/CartSlicer";
 
-
-const cart = () => {
+const PaymentMethod = () => {
+  const cart = useSelector((state) => state.cart);
   const navigation = useNavigation();
-  const handleCheckout = async ()=>{
+  const dispatch = useDispatch();
+  const handleCOD = async () => {
     try {
-      if (!await SecureStore.getItemAsync("accessToken") && !await SecureStore.getItemAsync("refreshToken")) {
-        ToastAndroid.show("You have to login before", ToastAndroid.SHORT);
-        router.push("/login-or-signup");
-      }else{
-        navigation.navigate("PaymentMethod");
+      const userId = await SecureStore.getItemAsync("userId");
+      const total = cart.total;
+      const result = await instance({
+        method: "POST",
+        url: "/order/create",
+        data: { userId: userId, total: total },
+      });
+      if (result && result.data.status ==='success') {
+        const orderId = result.data.data._id;
+        const products = cart.list.map((item) => {
+          return {
+            orderId: orderId,
+            productId: item._id,
+            quantity: item.quantity,
+          };
+        });
+        dispatch(resetCart({}));
+        console.log(products);
+        const result1 = await instance({
+          method: "POST",
+          url: "/orderdetail/create",
+          data: products,
+        });
+        alert("Success");
+        navigation.navigate("Cart")
       }
     } catch (error) {
       console.log(error);
-      
     }
-    
-  }
+  };
   const onIconsClick = useCallback(() => {
     Alert.alert("Notification", "Not");
   }, []);
-  const cart = useSelector(state => state.cart);
-  console.log(cart);
   return (
     <View style={[styles.container, styles.searchPage]}>
       <Pressable style={styles.backButton} onPress={() => router.back()}>
@@ -65,51 +82,15 @@ const cart = () => {
           source={require("../../assets/images/icons.png")}
         />
       </TouchableOpacity>
-
-      <View style={{ marginTop: 50, height: 513 }}>
-        <ScrollView>
-          {cart?.list && cart?.list?.length > 0
-            ? (cart?.list.map((item: any) => (<BoxCart item={item} key={item._id}/>)))
-            : null
-          }
-
-        </ScrollView>
-        {cart?.total && cart?.total > 0
-          ? (<View
-            style={{
-              marginTop: 10,
-              flexDirection: "column",
-              alignSelf: "flex-end",
-            }}
-          >
-            <View>
-              <Text
-                style={{
-                  fontFamily: "Alice",
-                  fontWeight: "400",
-                  fontSize: 25,
-                  lineHeight: 22.8,
-                  color: "#125642",
-                  paddingTop: 10,
-                  alignSelf: "flex-end"
-                }}
-              >
-                {cart?.total}đ
-              </Text>
-            </View>
-            <View style={{ paddingTop: 15 }}>
-              <View>
-                <Pressable
-                  onPress={handleCheckout}
-                  style={styles.buttonCheckout}
-                >
-                  <Text style={{ alignItems: "center" }}>Check out</Text>
-                </Pressable>
-              </View>
-            </View>
-          </View>): <Text style={{paddingBottom: 300}}>Your cart is empty</Text>}
-        
-
+      <View style={{ marginBottom: 400 }}>
+        <Pressable style={[styles.buttonLayout]} onPress={handleCOD}>
+          <View style={styles.childShadowBox} />
+          <Text style={[styles.button, styles.buttonTypo]}>COD</Text>
+        </Pressable>
+        <Pressable style={[styles.buttonLayout]} onPress={() => alert("VNPAY")}>
+          <View style={styles.childShadowBox} />
+          <Text style={[styles.button, styles.buttonTypo]}>VNPAY</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -117,15 +98,14 @@ const cart = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: "center",
+    justifyContent: "center",
   },
   box: {},
   buttonLayout: {
-    height: 31,
-    width: 160,
+    height: 50,
+    width: 280,
     top: 165,
-    position: "absolute",
+    marginTop: 30,
   },
   buttonTypo: {
     textAlign: "center",
@@ -246,18 +226,7 @@ const styles = StyleSheet.create({
     },
   },
   button: {
-    left: "26.81%",
-  },
-  promo: {
-    left: 30,
-    zIndex: 4,
-  },
-  button2: {
-    left: "10.85%",
-  },
-  bestseller: {
-    left: 200,
-    zIndex: 5,
+    alignSelf: "center",
   },
   button4: {
     left: "30%",
@@ -424,14 +393,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: Border.br_mini,
   },
-  buttonCheckout: {
-    backgroundColor: "#8E4949",
-    width: 133,
-    height: 29,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 5,
-  },
 });
 
-export default cart;
+export default PaymentMethod;
