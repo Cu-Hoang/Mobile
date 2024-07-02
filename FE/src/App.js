@@ -22,6 +22,7 @@ import cart from "../app/(tabs)/cart";
 import account from "../app/(tabs)/account";
 import SearchPage from "../app/(tabs)/SearchPage";
 import PaymentMethod from "../app/(modals)/PaymentMethod";
+import Momo from "../app/(modals)/Momo";
 import { useSelector } from "react-redux";
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -185,6 +186,11 @@ function CartStackScreen() {
       <CartStack.Screen
         name="PaymentMethod"
         component={PaymentMethod}
+        options={{ headerShown: false }}
+      />
+      <CartStack.Screen
+        name="Momo"
+        component={Momo}
         options={{ headerShown: false }}
       />
     </CartStack.Navigator>
