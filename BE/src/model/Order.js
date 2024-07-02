@@ -2,18 +2,22 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const orderSchema = new mongoose.Schema(
   {
-    userId: [{ type: Schema.Types.ObjectId, ref: "User",  required: true }],
+    userId: [{ type: Schema.Types.ObjectId, ref: "User", required: true }],
     total: {
       type: Number,
       default: 0,
     },
     status: {
       type: String,
-      default: "unpaid",
+      default: "pending",
     },
-    type: {
+    paymentmethod: {
       type: String,
-      default: "COD",
+      default: "",
+    },
+    isPaid: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

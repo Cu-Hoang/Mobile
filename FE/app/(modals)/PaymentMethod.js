@@ -9,47 +9,56 @@ import {
   Text,
   Alert,
   ScrollView,
+  ToastAndroid,
 } from "react-native";
-import {  useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, FontSize, Border } from "../../GlobalStyles";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import instance from "../config/axios";
-import { useSelector,useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import * as SecureStore from "expo-secure-store";
 import { resetCart } from "../redux/CartSlicer";
 
 const PaymentMethod = () => {
   const cart = useSelector((state) => state.cart);
   const navigation = useNavigation();
+  const { orderId } = useLocalSearchParams();
   const dispatch = useDispatch();
   const handleCOD = async () => {
     try {
-      const userId = await SecureStore.getItemAsync("userId");
-      const total = cart.total;
+      const result = await instance({
+        method: "PATCH",
+        url: `/order/update/${orderId}`,
+        data: {
+          status: "processing",
+          paymentmethod: "COD",
+        },
+      });
+      console.log(result.data);
+      dispatch(resetCart({}));
+      ToastAndroid.show("Success", ToastAndroid.SHORT);
+      navigation.navigate("Cart");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handleMomo = async () => {
+    try {
       const result = await instance({
         method: "POST",
-        url: "/order/create",
-        data: { userId: userId, total: total },
+        url: '/payment/momo',
+        data: {
+          order_id: orderId,
+          total: cart.total
+        },
       });
-      if (result && result.data.status ==='success') {
-        const orderId = result.data.data._id;
-        const products = cart.list.map((item) => {
-          return {
-            orderId: orderId,
-            productId: item._id,
-            quantity: item.quantity,
-          };
-        });
+      if(result && result.data.status ==='success'){
         dispatch(resetCart({}));
-        console.log(products);
-        const result1 = await instance({
-          method: "POST",
-          url: "/orderdetail/create",
-          data: products,
+        navigation.navigate("Momo", {
+          uri: result.data.data.payUrl,
         });
-        alert("Success");
-        navigation.navigate("Cart")
       }
+      
     } catch (error) {
       console.log(error);
     }
@@ -87,9 +96,9 @@ const PaymentMethod = () => {
           <View style={styles.childShadowBox} />
           <Text style={[styles.button, styles.buttonTypo]}>COD</Text>
         </Pressable>
-        <Pressable style={[styles.buttonLayout]} onPress={() => alert("VNPAY")}>
+        <Pressable style={[styles.buttonLayout]} onPress={handleMomo}>
           <View style={styles.childShadowBox} />
-          <Text style={[styles.button, styles.buttonTypo]}>VNPAY</Text>
+          <Text style={[styles.button, styles.buttonTypo]}>MOMO</Text>
         </Pressable>
       </View>
     </View>

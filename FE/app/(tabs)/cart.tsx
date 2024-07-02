@@ -17,23 +17,48 @@ import { useSelector } from "react-redux";
 import BoxCart from "../../components/BoxCart";
 import * as SecureStore from 'expo-secure-store';
 import { useNavigation } from "@react-navigation/native";
+import instance from "../config/axios";
 
 
 const cart = () => {
+  const Cart = useSelector((state) => state.cart);
   const navigation = useNavigation();
-  const handleCheckout = async ()=>{
+  const handleCheckout = async () => {
     try {
       if (!await SecureStore.getItemAsync("accessToken") && !await SecureStore.getItemAsync("refreshToken")) {
         ToastAndroid.show("You have to login before", ToastAndroid.SHORT);
         router.push("/login-or-signup");
-      }else{
-        navigation.navigate("PaymentMethod");
+      } else {
+        const userId = await SecureStore.getItemAsync("userId");
+        const total = Cart.total;
+        const result = await instance({
+          method: "POST",
+          url: "/order/create",
+          data: { userId: userId, total: total },
+        });
+        if (result && result.data.status === "success") {
+          const orderId = result.data.data._id;
+          const products = Cart.list.map((item) => {
+            return {
+              orderId: orderId,
+              productId: item._id,
+              quantity: item.quantity,
+            };
+          });
+          const result1 = await instance({
+            method: "POST",
+            url: "/orderdetail/create",
+            data: products,
+          });
+          navigation.navigate("PaymentMethod", {
+            orderId: orderId
+          });
+        }
       }
     } catch (error) {
       console.log(error);
-      
+
     }
-    
   }
   const onIconsClick = useCallback(() => {
     Alert.alert("Notification", "Not");
@@ -69,7 +94,7 @@ const cart = () => {
       <View style={{ marginTop: 50, height: 513 }}>
         <ScrollView>
           {cart?.list && cart?.list?.length > 0
-            ? (cart?.list.map((item: any) => (<BoxCart item={item} key={item._id}/>)))
+            ? (cart?.list.map((item: any) => (<BoxCart item={item} key={item._id} />)))
             : null
           }
 
@@ -107,8 +132,8 @@ const cart = () => {
                 </Pressable>
               </View>
             </View>
-          </View>): <Text style={{paddingBottom: 300}}>Your cart is empty</Text>}
-        
+          </View>) : <Text style={{ paddingBottom: 300 }}>Your cart is empty</Text>}
+
 
       </View>
     </View>

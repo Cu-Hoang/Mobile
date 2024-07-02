@@ -79,10 +79,10 @@ const Review = () => {
               <View style={[styles.groupItem, styles.groupLayout]} />
               <Text
                 style={[styles.FontText, styles.Aligment]}
-                numberOfLines={6}
+                numberOfLines={2}
               >
-                Lorem ipsum dolor sit amet consectetur. Sit fames netus
-                consectetur venenatis leo commodo. Eu orci pretium orci
+                {product.name}: ipsum dolor sit amet consectetur. Sit fames netus
+                
               </Text>
             </View>
           </View>
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   groupLayout: {
-    height: 120,
+    height: 66,
     width: 320,
     left: 0,
     position: "absolute",
