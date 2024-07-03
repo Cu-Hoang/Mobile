@@ -9,15 +9,60 @@ import {
   Text,
   Alert,
   ScrollView,
+  ToastAndroid,
 } from "react-native";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, FontSize, Border } from "../../GlobalStyles";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import instance from "../config/axios";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import * as SecureStore from "expo-secure-store";
+import { resetCart } from "../redux/CartSlicer";
 
-const wishlist = () => {
-
+const PaymentMethod = () => {
+  const cart = useSelector((state) => state.cart);
+  const navigation = useNavigation();
+  const { orderId } = useLocalSearchParams();
+  const dispatch = useDispatch();
+  const handleCOD = async () => {
+    try {
+      const result = await instance({
+        method: "PATCH",
+        url: `/order/update/${orderId}`,
+        data: {
+          status: "processing",
+          paymentmethod: "COD",
+        },
+      });
+      console.log(result.data);
+      dispatch(resetCart({}));
+      ToastAndroid.show("Success", ToastAndroid.SHORT);
+      navigation.navigate("Cart");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handleMomo = async () => {
+    try {
+      const result = await instance({
+        method: "POST",
+        url: '/payment/momo',
+        data: {
+          order_id: orderId,
+          total: cart.total
+        },
+      });
+      if(result && result.data.status ==='success'){
+        dispatch(resetCart({}));
+        navigation.navigate("Momo", {
+          uri: result.data.data.payUrl,
+        });
+      }
+      
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const onIconsClick = useCallback(() => {
     Alert.alert("Notification", "Not");
   }, []);
@@ -46,13 +91,15 @@ const wishlist = () => {
           source={require("../../assets/images/icons.png")}
         />
       </TouchableOpacity>
-
-      <View style={{ paddingTop: 215, paddingLeft: 30 }}>
-        <ScrollView>
-          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-
-          </View>
-        </ScrollView>
+      <View style={{ marginBottom: 400 }}>
+        <Pressable style={[styles.buttonLayout]} onPress={handleCOD}>
+          <View style={styles.childShadowBox} />
+          <Text style={[styles.button, styles.buttonTypo]}>COD</Text>
+        </Pressable>
+        <Pressable style={[styles.buttonLayout]} onPress={handleMomo}>
+          <View style={styles.childShadowBox} />
+          <Text style={[styles.button, styles.buttonTypo]}>MOMO</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -64,10 +111,10 @@ const styles = StyleSheet.create({
   },
   box: {},
   buttonLayout: {
-    height: 31,
-    width: 160,
+    height: 50,
+    width: 280,
     top: 165,
-    position: "absolute",
+    marginTop: 30,
   },
   buttonTypo: {
     textAlign: "center",
@@ -188,18 +235,7 @@ const styles = StyleSheet.create({
     },
   },
   button: {
-    left: "26.81%",
-  },
-  promo: {
-    left: 30,
-    zIndex: 4,
-  },
-  button2: {
-    left: "10.85%",
-  },
-  bestseller: {
-    left: 200,
-    zIndex: 5,
+    alignSelf: "center",
   },
   button4: {
     left: "30%",
@@ -368,4 +404,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default wishlist;
+export default PaymentMethod;

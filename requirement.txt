@@ -6,3 +6,4 @@ npm install express dotenv bcrypt cookie-parser cors dotenv express jsonwebtoken
 change the MONGODB_URL in .env to connect MongoDB
 
 FE:
+npm install @reduxjs/toolkit

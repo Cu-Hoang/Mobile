@@ -12,10 +12,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, FontSize, Border } from "../../GlobalStyles";
 import { router } from "expo-router";
+import { useDispatch } from "react-redux";
 
 const PromoProducts = () => {
   const navigation = useNavigation();
-
   const onIconsClick = useCallback(() => {
     Alert.alert("Notification", "Not");
   }, []);
@@ -38,21 +38,6 @@ const PromoProducts = () => {
         resizeMode="cover"
         source={require("../../assets/images/logoC22.png")}
       />
-      <Pressable
-        style={[styles.button, styles.buttonLayout]}
-        Navigation="Promo Products">
-        <View style={styles.buttonShadowBox} />
-        <Text style={[styles.button1, styles.buttonTypo]}>Promo</Text>
-      </Pressable>
-      <TouchableOpacity
-        style={[styles.button2, styles.buttonLayout]}
-        Navigation="Best Seller"
-        activeOpacity={0.2}
-        onPress={() => router.push("/(modals)/BestSeller")}
-      >
-        <View style={styles.buttonShadowBox} />
-        <Text style={[styles.button3, styles.buttonTypo]}>Best Seller</Text>
-      </TouchableOpacity>
       <Pressable
         style={[styles.icons, styles.iconsPosition]}
         onPress={onIconsClick}

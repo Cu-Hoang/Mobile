@@ -3,11 +3,11 @@ import * as SecureStore from "expo-secure-store";
 
 const accessToken = SecureStore.getItem('accessToken')
 const instance = axios.create({
-  baseURL: "http://192.168.2.11:3000/api/v1",
+  baseURL: "http://172.16.3.7:3000/api/v1",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json; charset=utf-8",
-    authorization: accessToken
+     authorization: accessToken
   },
 });
 

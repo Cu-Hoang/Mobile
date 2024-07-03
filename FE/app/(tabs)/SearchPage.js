@@ -14,6 +14,7 @@ import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, FontSize, Border } from "../../GlobalStyles";
 import { router } from "expo-router";
 import instance from "../config/axios";
+import { CommonActions } from "@react-navigation/native";
 
 const SearchPage = () => {
   const navigation = useNavigation();
@@ -64,48 +65,43 @@ const SearchPage = () => {
       <Pressable
         style={[styles.promo, styles.buttonLayout]}
         Navigation="Promo Products"
-        onPress={() => router.push("/(modals)/PromoProducts")}
+        onPress={() => navigation.navigate("Promo")}
       >
         <View style={styles.childShadowBox} />
         <Text style={[styles.button, styles.buttonTypo]}>Promo</Text>
       </Pressable>
       <Pressable
         style={[styles.bestseller, styles.buttonLayout]}
-        onPress={() => router.push("/(modals)/BestSeller")}
+        onPress={() => navigation.navigate("BestSeller")}
       >
         <View style={styles.childShadowBox} />
         <Text style={[styles.button2, styles.buttonTypo]}>Best Sellers</Text>
       </Pressable>
-      {/* <Pressable
-        style={[styles.Menu, styles.buttonLayout]}
-        onPress={() => router.push("/(tabs)/account")}
-      >
-        <View style={styles.childShadowBox} />
-        <Text style={[styles.button4, styles.buttonTypo]}>Account</Text>
-      </Pressable> */}
       <View style={{ paddingTop: 215, paddingLeft: 30 }}>
         <ScrollView>
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             {products.map((item) => (
-              <TouchableOpacity
+               <TouchableOpacity
                 style={[styles.rectangleLayout]}
                 Navigation="Review"
                 activeOpacity={0.2}
                 onPress={() =>
-                  router.push({
-                    pathname: "/(modals)/Review",
-                    params: {
-                      productId: item._id,
-                    },
-                  })
-                }
+                  navigation.dispatch(
+                    CommonActions.navigate({
+                      name: "Review",
+                      params: {
+                        productId: item._id,
+                      },
+                    })
+                  )
+                } key={item._id}
               >
                 <Image
                   style={[styles.rectangleIcon, styles.rectangleLayout]}
                   resizeMode="cover"
                   source={{ uri: item.image }}
                 />
-                <Text style={[styles.strawberryTea, styles.bobasteaTypo]}>
+                <Text style={[styles.strawberryTea, styles.bobasteaTypo]} >
                   {item.name}
                 </Text>
                 <Image

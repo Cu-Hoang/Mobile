@@ -41,19 +41,88 @@ const createError = require("http-errors");
 //   }
 // };
 
+// const favoriteController = {
+//   addFavorite: async (req, res, next) => {
+//     try {
+//       const { userId, productId } = req.body;
+//       const existingFavorite = await Favorite.findOne({ userId, productId });
+//       if (existingFavorite) return res.status(400).json({ message: 'Product already in favorites' });
+
+//       const newFavorite = new Favorite({ userId, productId });
+//       const result = await newFavorite.save();
+//       if (!result) return res.status(500).json({ message: 'Error adding to favorites' });
+
+//       return res.status(201).json({ message: 'Product added to favorites successfully', data: result });
+//     } catch (error) {
+//       next(error);
+//     }
+//   },
+
+//   getFavorites: async (req, res, next) => {
+//     try {
+//       const { userId } = req.params;
+//       const favorites = await Favorite.find({ userId }).populate('productId');
+//       if (!favorites) return res.status(404).json({ message: 'No favorites found' });
+
+//       return res.status(200).json({ message: 'Favorites retrieved successfully', data: favorites });
+//     } catch (error) {
+//       next(error);
+//     }
+//   },
+
+//   removeFavorite: async (req, res, next) => {
+//     try {
+//       const { userId, productId } = req.body;
+//       const result = await Favorite.findOneAndDelete({ userId, productId });
+//       if (!result) return res.status(404).json({ message: 'Favorite not found' });
+
+//       return res.status(200).json({ message: 'Product removed from favorites successfully', data: result });
+//     } catch (error) {
+//       next(error);
+//     }
+//   },
+// };
+
+// module.exports = favoriteController;
+
 const favoriteController = {
   addFavorite: async (req, res, next) => {
     try {
       const { userId, productId } = req.body;
-      const existingFavorite = await Favorite.findOne({ userId, productId });
-      if (existingFavorite) return res.status(400).json({ message: 'Product already in favorites' });
 
+      // Kiểm tra xem productId có hợp lệ không
+      const product = await Product.findById(productId);
+      if (!product) {
+        res.status(404).json({ message: 'Product not found' });
+        console.log('LOG Sau khi response');
+        console.log('Response after adding to favorite: Product not found');
+        return;
+      }
+
+      // Kiểm tra xem sản phẩm đã có trong danh sách yêu thích chưa
+      const existingFavorite = await Favorite.findOne({ userId, productId });
+      if (existingFavorite) {
+        res.status(400).json({ message: 'Product already in favorites' });
+        console.log('LOG Sau khi response');
+        console.log('Response after adding to favorite: Product already in favorites');
+        return;
+      }
+
+      // Thêm sản phẩm vào danh sách yêu thích
       const newFavorite = new Favorite({ userId, productId });
       const result = await newFavorite.save();
-      if (!result) return res.status(500).json({ message: 'Error adding to favorites' });
+      if (!result) {
+        res.status(500).json({ message: 'Error adding to favorites' });
+        console.log('LOG Sau khi response');
+        console.log('Response after adding to favorite: Error adding to favorites');
+        return;
+      }
 
-      return res.status(201).json({ message: 'Product added to favorites successfully', data: result });
+      res.status(201).json({ message: 'Product added to favorites successfully', data: result });
+      console.log('LOG Sau khi response');
+      console.log('Response after adding to favorite: Product added to favorites successfully');
     } catch (error) {
+      console.error('Error in addFavorite:', error);
       next(error);
     }
   },
@@ -62,10 +131,18 @@ const favoriteController = {
     try {
       const { userId } = req.params;
       const favorites = await Favorite.find({ userId }).populate('productId');
-      if (!favorites) return res.status(404).json({ message: 'No favorites found' });
+      if (!favorites) {
+        res.status(404).json({ message: 'No favorites found' });
+        console.log('LOG Sau khi response');
+        console.log('Response after fetching favorites: No favorites found');
+        return;
+      }
 
-      return res.status(200).json({ message: 'Favorites retrieved successfully', data: favorites });
+      res.status(200).json({ message: 'Favorites retrieved successfully', data: favorites });
+      console.log('LOG Sau khi response');
+      console.log('Response after fetching favorites: Favorites retrieved successfully');
     } catch (error) {
+      console.error('Error in getFavorites:', error);
       next(error);
     }
   },
@@ -74,10 +151,18 @@ const favoriteController = {
     try {
       const { userId, productId } = req.body;
       const result = await Favorite.findOneAndDelete({ userId, productId });
-      if (!result) return res.status(404).json({ message: 'Favorite not found' });
+      if (!result) {
+        res.status(404).json({ message: 'Favorite not found' });
+        console.log('LOG Sau khi response');
+        console.log('Response after removing favorite: Favorite not found');
+        return;
+      }
 
-      return res.status(200).json({ message: 'Product removed from favorites successfully', data: result });
+      res.status(200).json({ message: 'Product removed from favorites successfully', data: result });
+      console.log('LOG Sau khi response');
+      console.log('Response after removing favorite: Product removed from favorites successfully');
     } catch (error) {
+      console.error('Error in removeFavorite:', error);
       next(error);
     }
   },

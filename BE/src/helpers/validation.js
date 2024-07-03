@@ -38,11 +38,26 @@ const productValidate = (data) =>{
     name: joi.string().required()
   });
   return productSchema.validate(data);
+};
+const orderValidate = (data)=>{
+  const orderSchema = joi.object({
+    userId: joi.string().required(),
+  });
+  return orderSchema.validate(data);
+};
+const orderDetailValidate = (data)=>{
+  const orderDetailSchema = joi.object({
+    orderId: joi.string().required(),
+    productId: joi.string().required(),
+  });
+  return orderDetailSchema.validate(data);
 }
 module.exports = {
   userValidate,
   emailValidate,
   otpValidate,
   confirmPassword,
-  productValidate
+  productValidate,
+  orderValidate,
+  orderDetailValidate
 };
