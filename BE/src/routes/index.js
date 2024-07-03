@@ -5,8 +5,8 @@ const order = require("./order");
 const orderdetail = require("./orderdetail");
 const payment = require("./payment");
 const upload = require("./upload");
-const user = require("./user");
-const wishlistRoutes = require('./wishlist');
+const favorite = require("./favorite");
+const favoritedetail = require("./favoritedetail");
 
 const initRoutes = (app) => {
   app.use("/api/v1/mail", mail);
@@ -16,9 +16,8 @@ const initRoutes = (app) => {
   app.use("/api/v1/order", order);
   app.use("/api/v1/orderdetail", orderdetail);
   app.use("/api/v1/payment",payment)
-  app.use('/api/v1/wishlist', wishlistRoutes);
-  app.use("/api/v1/user", user);
-
+  app.use("/api/v1/favorite",favorite)
+  app.use("/api/v1/favoritedetail",favoritedetail)
   app.use("/", (req, res) => res.send("SERVER ON"));
 };
 module.exports = initRoutes;

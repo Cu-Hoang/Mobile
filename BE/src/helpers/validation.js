@@ -51,6 +51,19 @@ const orderDetailValidate = (data)=>{
     productId: joi.string().required(),
   });
   return orderDetailSchema.validate(data);
+};
+const favoriteValidate = (data)=>{
+  const favoriteSchema = joi.object({
+    userId: joi.string().required(),
+  });
+  return favoriteSchema.validate(data);
+};
+const favoriteDetailValidate = (data)=>{
+  const favoriteDetailSchema = joi.object({
+    favoriteId: joi.string().required(),
+    productId: joi.string().required(),
+  });
+  return favoriteDetailSchema.validate(data);
 }
 module.exports = {
   userValidate,
@@ -59,5 +72,7 @@ module.exports = {
   confirmPassword,
   productValidate,
   orderValidate,
-  orderDetailValidate
+  orderDetailValidate,
+  favoriteValidate,
+  favoriteDetailValidate
 };

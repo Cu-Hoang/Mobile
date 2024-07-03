@@ -8,8 +8,6 @@ const initRoutes = require("./routes/index");
 require("./config/connection_mongodb");
 require('./config/connection_redis')
 
-const wishlistRoutes = require("./routes/wishlist");
-
 const app = express();
 app.use(
   cors({
@@ -20,7 +18,6 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extends: true }));
-app.use("/api/wishlist", wishlistRoutes);
 
 
 initRoutes(app);

@@ -9,18 +9,59 @@ import {
   Text,
   Alert,
   ScrollView,
+  ToastAndroid,
 } from "react-native";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, FontSize, Border } from "../../GlobalStyles";
 import { router } from "expo-router";
+import { useSelector } from "react-redux";
+import BoxFavorite from "../../components/BoxFavorite";
+import * as SecureStore from 'expo-secure-store';
+import { useNavigation } from "@react-navigation/native";
 import instance from "../config/axios";
-import { useDispatch } from "react-redux";
 
-const wishlist = () => {
 
+const favorite = () => {
+  const Favorite = useSelector((state) => state.favorite);
+  const navigation = useNavigation();
+  const onWishlistImageClick = async () => {
+    try {
+      if (!await SecureStore.getItemAsync("accessToken") && !await SecureStore.getItemAsync("refreshToken")) {
+        ToastAndroid.show("You have to login before", ToastAndroid.SHORT);
+        router.push("/login-or-signup");
+      } else {
+        const userId = await SecureStore.getItemAsync("userId");
+        const total = Favorite.total;
+        const result = await instance({
+          method: "POST",
+          url: "/favorite/create",
+          data: { userId: userId, total: total },
+        });
+        if (result && result.data.status === "success") {
+          const favoriteId = result.data.data._id;
+          const products = Favorite.list.map((item) => {
+            return {
+              favoriteId: favoriteId,
+              productId: item._id,
+              quantity: item.quantity,
+            };
+          });
+          const result1 = await instance({
+            method: "POST",
+            url: "/favoritedetail/create",
+            data: products,
+          });
+        }
+      }
+    } catch (error) {
+      console.log(error);
+
+    }
+  }
   const onIconsClick = useCallback(() => {
     Alert.alert("Notification", "Not");
   }, []);
+  const favorite = useSelector(state => state.favorite);
+  console.log(favorite);
   return (
     <View style={[styles.container, styles.searchPage]}>
       <Pressable style={styles.backButton} onPress={() => router.back()}>
@@ -47,12 +88,40 @@ const wishlist = () => {
         />
       </TouchableOpacity>
 
-      <View style={{ paddingTop: 215, paddingLeft: 30 }}>
+      <View style={{ marginTop: 50, height: 513 }}>
         <ScrollView>
-          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+          {favorite?.list && favorite?.list?.length > 0
+            ? (favorite?.list.map((item: any) => (<BoxFavorite item={item} key={item._id} />)))
+            : null
+          }
 
-          </View>
         </ScrollView>
+        {favorite?.total && favorite?.total > 0
+          ? (<View
+            style={{
+              marginTop: 10,
+              flexDirection: "column",
+              alignSelf: "flex-end",
+            }}
+          >
+            <View>
+              <Text
+                style={{
+                  fontFamily: "Alice",
+                  fontWeight: "400",
+                  fontSize: 25,
+                  lineHeight: 22.8,
+                  color: "#125642",
+                  paddingTop: 10,
+                  alignSelf: "flex-end"
+                }}
+              >
+                {favorite?.total}đ
+              </Text>
+            </View>
+          </View>) : <Text style={{ paddingBottom: 300 }}>Your wishlist is empty</Text>}
+
+
       </View>
     </View>
   );
@@ -60,7 +129,8 @@ const wishlist = () => {
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: "center",
+    flex: 1,
+    alignItems: "center",
   },
   box: {},
   buttonLayout: {
@@ -366,6 +436,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: Border.br_mini,
   },
+  buttonCheckout: {
+    backgroundColor: "#8E4949",
+    width: 133,
+    height: 29,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 5,
+  },
 });
 
-export default wishlist;
+export default favorite;

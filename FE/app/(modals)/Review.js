@@ -14,82 +14,40 @@ import { useNavigation } from "@react-navigation/native";
 import { FontFamily, Color, FontSize, Border } from "../../GlobalStyles";
 import { useLocalSearchParams } from "expo-router";
 import instance from "../config/axios";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { addToCart } from "../redux/CartSlicer";
-import { addToWishlist } from "../redux/WishlistSlice";
-
+import { addtofavorite } from "../redux/FavoriteSlicer";
 const Review = () => {
   const navigation = useNavigation();
-  const { productId, userId } = useLocalSearchParams();
-  const [product, setProduct, user, setUser ] = useState({});
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (userId) {
-      instance({
-        method: "GET",
-        url: `/user/getUser/${userId}`,
-      })
-        .then((res) => {
-          if (res.data.status === "success") setUser(res.data.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      console.error("User ID is required.");
-    }
-  }, [userId]);
-
-  const onWishlistImageClick = useCallback(() => {
-    if (userId) {
-      instance.post('/wishlist/add', { userId, productId })
-        .then(response => {
-          if (response.data.status === 'success') {
-            dispatch(addToWishlist({ userId, productId }));
-            Alert.alert("Add to Wishlist", "Successful!");
-          } else {
-            Alert.alert("Error", response.data.msg);
-          }
-        })
-        .catch(error => {
-          if (error.response) {
-            console.error("Response error:", error.response.data);
-            Alert.alert("Error", "There was an error with the server response.");
-          } else if (error.request) {
-            console.error("Request error:", error.request);
-            Alert.alert("Error", "No response received from the server.");
-          } else {
-            console.error("Error", error.message);
-            Alert.alert("Error", "There was an error setting up the request.");
-          }
-        });
-    } else {
-      Alert.alert("Error", "User ID is required.");
-    }
-  }, [userId, productId, dispatch]);
+  const { productId } = useLocalSearchParams();
+  const [product, setProduct] = useState({});
 
   const onIconsClick = useCallback(() => {
     Alert.alert("Notification", "Not");
   }, []);
-
+  console.log(productId);
   useEffect(() => {
-    if (productId) {
-      instance({
-        method: "GET",
-        url: `/product/getProduct/${productId}`,
+    instance({
+      method: "GET",
+      url: `/product/getProduct/${productId}`,
+    })
+      .then((res) => {
+        if (res.data.status === "success") setProduct(res.data.data);
       })
-        .then((res) => {
-          if (res.data.status === "success") setProduct(res.data.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      console.error("Product ID is required.");
-    }
-  }, [productId]);
-
+      .catch((err) => {
+        console.log(err);
+      });
+  },[]);
+  const dispatch = useDispatch();
+  const onWishlistImageClick = () => {
+    dispatch(
+      addtofavorite({
+        ...product,
+        quantity: 1,
+      })
+    );
+    alert("Add to Wishlist", "Successfull!")
+  };
   const handleAddToCart = () => {
     dispatch(
       addToCart({
@@ -97,9 +55,8 @@ const Review = () => {
         quantity: 1,
       })
     );
-    alert("success");
+    alert("Add to Cart", "Successfull!")
   };
-
   return (
       <View style={styles.review}>
         <Pressable
