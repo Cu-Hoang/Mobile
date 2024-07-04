@@ -14,7 +14,6 @@ const favoriteController = {
               return res.json({
                 status: "error",
                 msg: "There was an error when add wishlist",
-                
               });
             return res.json({
               status: "success",

@@ -1,102 +1,80 @@
 import {
-    SafeAreaView,
-    Text,
-    StyleSheet,
-    View,
-    Image,
-    ScrollView,
-    Pressable,
-  } from "react-native";
-  import React, { useEffect, useState } from "react";
-  import Icon from "react-native-vector-icons/AntDesign";
-  import Icon1 from "react-native-vector-icons/Entypo";
-  import { addToFavorite, removeItem, resetFavorite } from "@/app/redux/FavoriteSlicer";
-  import { useDispatch, useSelector } from "react-redux";
-  
-  const BoxFavorite = ({ item }) => {
-    const dispatch = useDispatch();
-    const handleRemove = () => {
-      dispatch(removeItem({ _id: item?._id }));
-    };
-    return (
-      <SafeAreaView style={styles.box}>
-        <View style={{ padding: 8 }}>
-          <Image source={{ uri: item.image }} style={styles.image} />
-        </View>
-        <View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <View>
-              <Text style={{ color: "#FFF8EF", fontSize: 18, paddingTop: 9 }}>
-                {item.name}
-              </Text>
-            </View>
-            <View>
-              <Icon1.Button
-                name="cross"
-                size={25}
-                style={{ paddingTop: 6, paddingBottom: 0, paddingRight: 0 }}
-                backgroundColor="#8E4949"
-                onPress={handleRemove}
-              />
-            </View>
-          </View>
-  
-          <View
-            style={{
-              width: 220,
-              flexDirection: "row",
-              justifyContent: "center",
-            }}
-            ellipsizeMode="tail"
-            numberOfLines={1}
-          >
-            <Text
-              style={{
-                color: "#FFF8EF",
-                paddingTop: 6,
-                paddingBottom: 0,
-                paddingRight: 0,
-                fontSize: 18,
-              }}
-            >
-              {item?.quantity}
-            </Text>
-            <Icon1.Button
-              name="squared-minus"
-              size={25}
-              style={{ paddingTop: 6, paddingBottom: 0, paddingRight: 0 }}
-              backgroundColor="#8E4949"
-              onPress={() => {
-                //if (quantity > 1) setQuantity((pre) => pre - 1);
-                dispatch(decrementQuantity({_id:item._id}))
-              }}
-            />
-          </View>
-        </View>
-      </SafeAreaView>
-    );
+  SafeAreaView,
+  Text,
+  StyleSheet,
+  View,
+  Image,
+  Pressable,
+} from "react-native";
+import React from "react";
+import Icon1 from "react-native-vector-icons/Entypo";
+import { useDispatch } from "react-redux";
+import { removeFromFavorite } from "@/app/redux/FavoriteSlicer";
+
+const BoxFavorite = ({ item }) => {
+  const dispatch = useDispatch();
+  const handleRemove = () => {
+    dispatch(removeFromFavorite({ _id: item?._id }));
   };
-  
-  const styles = StyleSheet.create({
-    box: {
-      backgroundColor: "#8E4949",
-      width: 350,
-      height: 100,
-      borderRadius: 15,
-      flexDirection: "row",
-      marginBottom: 8,
-    },
-    image: {
-      width: 100,
-      height: 84,
-      borderRadius: 15,
-      overflow: "hidden",
-    },
-  });
-  export default BoxFavorite;
-  
+
+  return (
+    <SafeAreaView style={styles.box}>
+      <View style={{ padding: 8 }}>
+        <Image source={{ uri: item.image }} style={styles.image} />
+      </View>
+      <View style={styles.infoContainer}>
+        <Text style={styles.name}>{item.name}</Text>
+        <Text style={styles.price}>{item?.price * item?.quantity}đ</Text>
+      </View>
+      <Icon1.Button
+        name="cross"
+        size={25}
+        style={styles.deleteButton}
+        backgroundColor="#8E4949"
+        onPress={handleRemove}
+      />
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  box: {
+    backgroundColor: "#8E4949",
+    width: 350,
+    height: 100,
+    borderRadius: 15,
+    flexDirection: "row",
+    marginBottom: 8,
+    alignItems: "center",
+    paddingHorizontal: 10,
+  },
+  image: {
+    width: 100,
+    height: 84,
+    borderRadius: 15,
+    overflow: "hidden",
+  },
+  infoContainer: {
+    flex: 1,
+    marginLeft: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  name: {
+    color: "#FFF8EF",
+    fontSize: 18,
+    textAlign: "center",
+  },
+  price: {
+    color: "#FFF8EF",
+    fontSize: 18,
+    textAlign: "center",
+  },
+  deleteButton: {
+    paddingTop: 6,
+    paddingBottom: 0,
+    paddingRight: 0,
+  },
+});
+
+export default BoxFavorite;

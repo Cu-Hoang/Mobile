@@ -21,16 +21,16 @@ import instance from "../config/axios";
 
 
 const favorite = () => {
-  const Favorite = useSelector((state) => state.favorite);
+  const favorite = useSelector((state) => state.favorite);
   const navigation = useNavigation();
-  const onWishlistImageClick = async () => {
+  const handleCheckout = async () => {
     try {
       if (!await SecureStore.getItemAsync("accessToken") && !await SecureStore.getItemAsync("refreshToken")) {
         ToastAndroid.show("You have to login before", ToastAndroid.SHORT);
         router.push("/login-or-signup");
       } else {
         const userId = await SecureStore.getItemAsync("userId");
-        const total = Favorite.total;
+        const total = favorite.total;
         const result = await instance({
           method: "POST",
           url: "/favorite/create",
@@ -38,11 +38,10 @@ const favorite = () => {
         });
         if (result && result.data.status === "success") {
           const favoriteId = result.data.data._id;
-          const products = Favorite.list.map((item) => {
+          const products = favorite.list.map((item) => {
             return {
               favoriteId: favoriteId,
               productId: item._id,
-              quantity: item.quantity,
             };
           });
           const result1 = await instance({
@@ -57,10 +56,12 @@ const favorite = () => {
 
     }
   }
+  useEffect(() => {
+    handleCheckout();
+  }, []);
   const onIconsClick = useCallback(() => {
     Alert.alert("Notification", "Not");
   }, []);
-  const favorite = useSelector(state => state.favorite);
   console.log(favorite);
   return (
     <View style={[styles.container, styles.searchPage]}>
@@ -119,7 +120,7 @@ const favorite = () => {
                 {favorite?.total}đ
               </Text>
             </View>
-          </View>) : <Text style={{ paddingBottom: 300 }}>Your wishlist is empty</Text>}
+          </View>) : <Text style={{ paddingBottom: 0 }}></Text>}
 
 
       </View>

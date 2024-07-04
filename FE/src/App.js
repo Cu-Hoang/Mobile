@@ -17,7 +17,7 @@ import splashScreen from "../app/(modals)/splash-screen";
 import PromoProducts from "../app/(modals)/PromoProducts";
 import BestSeller from "../app/(modals)/BestSeller";
 import Review from "../app/(modals)/Review";
-import wishlist from "../app/(tabs)/wishlist";
+import favorite from "../app/(tabs)/wishlist";
 import cart from "../app/(tabs)/cart";
 import account from "../app/(tabs)/account";
 import SearchPage from "../app/(tabs)/SearchPage";
@@ -112,14 +112,14 @@ function TabsNavigator() {
         component={HomeStackScreen}
       />
       <Tab.Screen
-        name="wishlist"
+        name="favorite"
         options={{
           tabBarIcon: ({ color, size }) => (
             <Octicons color={color} size={size} name="heart" />
           ),
           headerShown: false,
         }}
-        component={wishlist}
+        component={FavoriteStackScreen}
       />
 
       <Tab.Screen
@@ -194,5 +194,17 @@ function CartStackScreen() {
         options={{ headerShown: false }}
       />
     </CartStack.Navigator>
+  );
+}
+const FavoriteStack = createNativeStackNavigator();
+function FavoriteStackScreen() {
+  return (
+    <FavoriteStack.Navigator>
+      <FavoriteStack.Screen
+        name="Favorite"
+        component={favorite}
+        options={{ headerShown: false }}
+      />
+    </FavoriteStack.Navigator>
   );
 }

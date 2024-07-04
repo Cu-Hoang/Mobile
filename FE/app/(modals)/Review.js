@@ -16,7 +16,7 @@ import { useLocalSearchParams } from "expo-router";
 import instance from "../config/axios";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../redux/CartSlicer";
-import { addtofavorite } from "../redux/FavoriteSlicer";
+import { addToFavorite } from "../redux/FavoriteSlicer";
 const Review = () => {
   const navigation = useNavigation();
   const { productId } = useLocalSearchParams();
@@ -41,7 +41,7 @@ const Review = () => {
   const dispatch = useDispatch();
   const onWishlistImageClick = () => {
     dispatch(
-      addtofavorite({
+      addToFavorite({
         ...product,
         quantity: 1,
       })
