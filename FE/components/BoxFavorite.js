@@ -24,7 +24,7 @@ const BoxFavorite = ({ item }) => {
       </View>
       <View style={styles.infoContainer}>
         <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.price}>{item?.price * item?.quantity}đ</Text>
+        <Text style={styles.price}>{item.item}đ</Text>
       </View>
       <Icon1.Button
         name="cross"
